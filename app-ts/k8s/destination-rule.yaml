@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1
+
+kind: DestinationRule
+metadata:
+  name: app-service-mesh-dr
+  namespace: app-mesh
+spec:
+  # nome do service usado no virtual-service.yaml
+  host: app-service-mesh-svc.app-mesh.svc.cluster.local
+  subsets:
+    # nome dos subsets usados no virtual-service.yaml
+    - name: v1
+      labels:
+        # versao do label usado no deployment.yaml
+        version: v1
+    - name: v2
+      labels:
+        # versao do label usado no deployment-v2.yaml
+        version: v2

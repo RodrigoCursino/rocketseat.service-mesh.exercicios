@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-service-mesh-v2
+  namespace: app-mesh
+
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+      maxSurge: 20%
+  selector:
+    matchLabels:
+      app: app-service-mesh
+  template:
+    metadata:
+      labels:
+        app: app-service-mesh
+        version: v2
+    spec:
+      containers:
+        - name: app-service-mesh
+          image: rcursino/app-service-mesh:v2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "200m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"

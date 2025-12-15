@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: app-service-mesh-routes
+  namespace: app-mesh
+spec:
+  # nome do service usado no service.yaml
+  hosts:
+    - app-service-mesh-svc # Nome do service para mais que um serviço usar: "*"
+  http:
+    - route:
+        - destination:
+            host: app-service-mesh-svc.app-mesh.svc.cluster.local
+            subset: v1
+          weight: 50  
+        - destination:
+            host: app-service-mesh-svc.app-mesh.svc.cluster.local
+            subset: v2
+          weight: 50

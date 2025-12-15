@@ -1,0 +1,59 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: cluster-service-mesh
+
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker
+
+# criar o cluster com:
+# kind create cluster --config=infra/kind.yaml
+# acessar o cluster com:
+# kubectl cluster-info --context kind-cluster-service-mesh
+# instalar o istoioctl com:
+# siga o passo 1 do instalacao_istio.md
+# instalar o istio no cluster com:
+# istioctl install
+# verificar se o istio foi instalado com:
+# kubectl get pods -n istio-system
+# criar a namespace app-mesh com:
+# kubectl apply -f app-ts/k8s/namespace.yaml
+# criar o deployment com:
+# kubectl apply -f app-ts/k8s/deployment.yaml
+# criar o service com:
+# kubectl apply -f app-ts/k8s/service.yaml
+# verificar se o deployment e service foram criados com:
+# kubectl get deployments -n app-mesh
+# kubectl get services -n app-mesh
+# acessar o pod com:
+# kubectl get pods -n app-mesh
+# comando para usar o istio como sidecar no namespace app-mesh:
+# kubectl label namespace app-mesh istio-injection=enabled --overwrite ou via arquivo yaml na criacao da namespace
+# apos criar a configuracao do istio, reiniciar os pods com:
+# kubectl rollout restart deployment app-service-mesh -n app-mesh
+# verificar os pods com:
+# kubectl get pods -n app-mesh
+# baixar o kiali na pasta de infra com:
+# wget https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/kiali.yaml
+# instalar o kiali com:
+# kubectl apply -f infra/kiali.yaml
+# verificar se o kiali foi instalado com:
+# kubectl get pods -n istio-system
+# configurar o kubernets gateway api com:
+# kubectl get crd gateways.gateway.networking.k8s.io &> /dev/null || \
+# { kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v1.4.0" | kubectl apply -f -; }
+# instalar o prometheus com:
+# wget https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/prometheus.yaml
+# após baixar o prometheus, instalar com:
+# kubectl apply -f infra/prometheus.yaml
+# verificar se o prometheus foi instalado com:
+# kubectl get pods -n istio-system
+# instalar o jaeger na pasta de infra com:
+# wget https://raw.githubusercontent.com/istio/istio/refs/heads/master/samples/addons/jaeger.yaml
+# instalar o jaeger com:
+# kubectl apply -f infra/jaeger.yaml
+# verificar se o jaeger foi instalado com:
+# kubectl get pods -n istio-system
+# rodar um teste de carga com:
+# kubectl run -it fortio -n app-mesh --rm --image=fortio/fortio -- load -qps 8000 -t 60s -c 35 "http://app-service-mesh-svc/healthz"
