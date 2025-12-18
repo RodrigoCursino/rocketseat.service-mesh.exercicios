@@ -7,13 +7,35 @@ metadata:
 spec:
   # nome do service usado no virtual-service.yaml
   host: app-service-mesh-svc.app-mesh.svc.cluster.local
+  # configuracao geral do host
+  trafficPolicy: 
+    loadBalancer: 
+      # simple: RANDOM
+      consistentHash:
+        httpQueryParameterName: "teste" # exemplo de hash por query parameter esencial para configuracoes de canary deployment
+        # para rodar o teste da linha acima, use a URL: http://<service-url>/?teste=algumvalor
+        # exemplo kubectl run -it fortio -n app-mesh --rm --image=fortio/fortio -- load -qps 500 -t 60s -c 1 "http://app-service-mesh-svc/healthz?teste=true"
+    # configuração de circuit breaking
+    outlierDetection:
+      consecutiveGatewayErrors: 1 # erros de indisponibilidade
+      interval: 1s
+      baseEjectionTime: 120s
+      maxEjectionPercent: 100
+      # consecutive5xxErrors: 7 # erros de servidor
   subsets:
     # nome dos subsets usados no virtual-service.yaml
     - name: v1
       labels:
         # versao do label usado no deployment.yaml
         version: v1
+      # as configuracoes de trafego podem ser sobrescritas por subset
+      trafficPolicy: 
+        loadBalancer: 
+          simple: LEAST_CONN
     - name: v2
       labels:
         # versao do label usado no deployment-v2.yaml
         version: v2
+      trafficPolicy: 
+        loadBalancer: 
+          simple: RANDOM
